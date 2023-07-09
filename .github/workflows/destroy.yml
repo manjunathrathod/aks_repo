@@ -1,0 +1,38 @@
+name: 'Terraform Destroy'
+
+on:
+  workflow_dispatch:
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Install the latest version of Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.5
+
+      # Terraform initialization
+      - name: Terraform Init
+        run: terraform init
+
+      # Terraform plan for destroy
+      - name: Terraform Plan
+        run: terraform plan TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }}
+
+      # Terraform destroy
+      - name: Terraform Destroy
+        run: terraform destroy TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }} -auto-approve

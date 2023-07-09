@@ -1,0 +1,52 @@
+name: 'Terraform Deploy AKS'
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+          shell: bash
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Install the latest version of Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+          terraform_wrapper: true
+        
+      - name: Terraform fmt
+        run: terraform fmt -check
+        continue-on-error: true
+        
+      # Terraform initialization
+      - name: Terraform Init
+        run: terraform init
+
+      # Terraform plan
+      - name: Terraform Plan
+        run: terraform plan TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }}
+      
+      # Terraform Validate
+      - name: Terraform Validate
+        run: terraform validate
+
+
+      # Terraform Apply
+      - name: Terraform Apply
+        run: terraform apply TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }} -auto-approve 
