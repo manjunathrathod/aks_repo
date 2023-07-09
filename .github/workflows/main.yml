@@ -40,7 +40,7 @@ jobs:
 
       # Terraform plan
       - name: Terraform Plan
-        run: terraform plan TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }}
+        run: terraform plan -lock=false TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }}
       
       # Terraform Validate
       - name: Terraform Validate
