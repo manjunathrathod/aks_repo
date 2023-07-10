@@ -31,8 +31,16 @@ jobs:
 
       # Terraform plan for destroy
       - name: Terraform Plan
-        run: terraform plan TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }}
-
+        run: terraform plan
+        env:
+          TF_VAR_aks_service_principal_app_id: ${{ secrets.ARM_CLIENT_ID }}
+          TF_VAR_aks_service_principal_client_secret: ${{ secrets.ARM_CLIENT_SECRET }}
+          TF_VAR_vm_password: ${{ secrets.VM_PASSWORD }}
+          
       # Terraform destroy
       - name: Terraform Destroy
-        run: terraform destroy TF_VAR_aks_service_principal_app_id=${{ secrets.ARM_CLIENT_ID }} TF_VAR_aks_service_principal_client_secret=${{ secrets.ARM_CLIENT_SECRET }} TF_VAR_vm_password=${{ secrets.VM_PASSWORD }} -auto-approve
+        run: terraform destroy  -auto-approve
+        env:
+          TF_VAR_aks_service_principal_app_id: ${{ secrets.ARM_CLIENT_ID }}
+          TF_VAR_aks_service_principal_client_secret: ${{ secrets.ARM_CLIENT_SECRET }}
+          TF_VAR_vm_password: ${{ secrets.VM_PASSWORD }}
